@@ -1,11 +1,38 @@
 import json
 import subprocess
 from flask import Flask, render_template
+import socket
 
 app = Flask(__name__)
 
-app.config['SERVER_NAME'] = ['3.134.238.10', '3.129.111.220', '52.15.118.168']
+outbound_ips = ['3.134.238.10', '3.129.111.220', '52.15.118.168']
 
+# Function to test if an IP is reachable
+def is_ip_reachable(ip):
+    try:
+        # Create a socket and attempt to connect to a known port
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)  # Set a timeout value
+        result = sock.connect_ex((ip, 80))  # Use port 80 as an example
+
+        # If the connection is successful, the IP is reachable
+        reachable = (result == 0)
+    except socket.error:
+        reachable = False
+
+    return reachable
+
+# Select the outbound IP based on reachability
+def get_outbound_ip():
+    for ip in outbound_ips:
+        if is_ip_reachable(ip):
+            return ip
+
+    # If none of the IPs are reachable, you can handle it accordingly
+    # For example, raise an exception or return a default IP
+    return None
+
+app.config['SERVER_NAME'] = get_outbound_ip()
 
 @app.route('/')
 def index():
