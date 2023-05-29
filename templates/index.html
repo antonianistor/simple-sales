@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product Information</title>
+  <style>
+    .product {
+      display: inline-block;
+      margin: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="productContainer"></div>
+  <div id="itemCount"></div>
+
+  <script>
+    // Fetch JSON data from a file
+    fetch('sales.json')
+      .then(response => response.json())
+      .then(jsonData => {
+        // Process the fetched JSON data
+        let count = 0;
+        Object.entries(jsonData).forEach(([productId, productData]) => {
+          
+          const avail = productData.avail;
+          const rawPrice = productData.price;
+          const price = rawPrice.substring(0, rawPrice.length - 2);
+          Object.entries(avail).forEach(([color, colorData]) => {
+            count++;
+            const imgLink = colorData.img_link;
+            const link = colorData.link;
+            console.log(colorData[0])
+            const sizes = Object.values(colorData)[0].map(item => item[0]);
+            console.log(sizes);
+
+            // Create product container
+            const productContainer = document.getElementById('productContainer');
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product');
+            productContainer.appendChild(productDiv);
+            
+            // Create container element
+            const container = document.createElement('div');
+            container.style.border = '1px solid #000'; // Add border
+            container.style.display = 'inline-block'; // Display as inline-block to create a square shape
+
+            // Create image element
+            const image = document.createElement('img');
+            image.src = imgLink;
+            image.alt = productId;
+            image.style.width = '200px';  // Set the desired width
+            image.style.height = 'auto';
+            productDiv.appendChild(image);
+            
+            // Create anchor element
+            const imglink = document.createElement('a');
+            imglink.href = link;
+            imglink.target = '_blank'; // Open link in a new tab/window
+            imglink.appendChild(image);
+            
+            // Append the anchor element to the container
+            container.appendChild(imglink);
+
+            
+            // Create sizes list
+            const sizesList = document.createElement('ul');
+            const listItem = document.createElement('li');
+            listItem.textContent = sizes;
+            sizesList.appendChild(listItem);
+            sizesList.style.listStyleType = 'none';
+            // Apply CSS styles for centering
+            sizesList.style.display = 'flex';
+            sizesList.style.justifyContent = 'center';
+            sizesList.style.alignItems = 'center';
+            listItem.style.textAlign = 'center';
+            listItem.style.padding = '0';
+
+            // Append the sizes list to the container
+            container.appendChild(sizesList);
+
+            const priceElement = document.createElement('span');
+            priceElement.textContent = price;
+            priceElement.style.color ='red';
+
+            container.appendChild(priceElement);
+
+            // Append the container to the productDiv
+            productDiv.appendChild(container);
+
+            });
+        });
+        const itemNum = document.createElement('div');
+        itemNum.textContent = count + "items";
+        const countContainer = document.getElementById('itemCount');
+        countContainer.appendChild(itemNum);
+
+
+      })
+      .catch(error => console.error('Error fetching JSON:', error));
+  </script>
+</body>
+</html>
