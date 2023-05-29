@@ -4,6 +4,9 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
+app.config['SERVER_NAME'] = ['3.134.238.10', '3.129.111.220', '52.15.118.168']
+
+
 @app.route('/')
 def index():
     # Your code logic goes here
