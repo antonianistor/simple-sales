@@ -122,4 +122,4 @@ def get_data():
     return data
 
 if __name__ == '__main__':
-    app.run(host='52.15.118.168')
+    app.run()
