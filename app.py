@@ -26,6 +26,7 @@ def is_ip_reachable(ip):
 def get_outbound_ip():
     for ip in outbound_ips:
         if is_ip_reachable(ip):
+            print("IP : {}".format(ip))
             return ip
 
     # If none of the IPs are reachable, you can handle it accordingly
@@ -121,4 +122,4 @@ def get_data():
     return data
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host=get_outbound_ip())
