@@ -13,7 +13,7 @@ def is_ip_reachable(ip):
         # Create a socket and attempt to connect to a known port
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(2)  # Set a timeout value
-        result = sock.connect_ex((ip, 80))  # Use port 80 as an example
+        result = sock.connect_ex((ip, 5000))  # Use port 80 as an example
 
         # If the connection is successful, the IP is reachable
         reachable = (result == 0)
@@ -122,4 +122,4 @@ def get_data():
     return data
 
 if __name__ == '__main__':
-    app.run(host=get_outbound_ip())
+    app.run(host='3.134.238.10')
