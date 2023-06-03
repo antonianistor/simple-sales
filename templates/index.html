@@ -11,93 +11,158 @@
   </style>
 </head>
 <body>
+  <!-- Example buttons for selecting size -->
+  <button class="size-filter-btn" data-size="">All Sizes</button>
+  <button class="size-filter-btn" data-size="XS">XS</button>
+  <button class="size-filter-btn" data-size="S">S</button>
+  <button class="size-filter-btn" data-size="M">M</button>
+  <button class="size-filter-btn" data-size="L">L</button>
+  <button class="size-filter-btn" data-size="XL">XL</button>
+  <!-- Add more buttons for different sizes -->
   <div id="productContainer"></div>
   <div id="itemCount"></div>
 
   <script>
     // Fetch JSON data from a file
-    fetch('sales.json')
+    fetch('./sales.json')
       .then(response => response.json())
       .then(jsonData => {
         // Process the fetched JSON data
-        let count = 0;
-        Object.entries(jsonData).forEach(([productId, productData]) => {
+    
+        renderProducts(jsonData);
+        
+        //filtering
+        const sizeFilterButtons = document.querySelectorAll('.size-filter-btn');
+
+        // Add event listener to each size filter button
+        sizeFilterButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const selectedSize = button.getAttribute('data-size');
+            console.log(jsonData);
+            // Filter products based on selected size
+            const filteredProducts = filterProducts(jsonData, selectedSize);
+            console.log(filteredProducts);
+            // Render filtered products
+            renderProducts(filteredProducts);
+    
           
-          const avail = productData.avail;
-          const rawPrice = productData.price;
-          const price = rawPrice.substring(0, rawPrice.length - 2);
-          Object.entries(avail).forEach(([color, colorData]) => {
-            count++;
-            const imgLink = colorData.img_link;
-            const link = colorData.link;
-            console.log(colorData[0])
-            const sizes = Object.values(colorData)[0].map(item => item[0]);
-            console.log(sizes);
-
-            // Create product container
-            const productContainer = document.getElementById('productContainer');
-            const productDiv = document.createElement('div');
-            productDiv.classList.add('product');
-            productContainer.appendChild(productDiv);
-            
-            // Create container element
-            const container = document.createElement('div');
-            container.style.border = '1px solid #000'; // Add border
-            container.style.display = 'inline-block'; // Display as inline-block to create a square shape
-
-            // Create image element
-            const image = document.createElement('img');
-            image.src = imgLink;
-            image.alt = productId;
-            image.style.width = '200px';  // Set the desired width
-            image.style.height = 'auto';
-            productDiv.appendChild(image);
-            
-            // Create anchor element
-            const imglink = document.createElement('a');
-            imglink.href = link;
-            imglink.target = '_blank'; // Open link in a new tab/window
-            imglink.appendChild(image);
-            
-            // Append the anchor element to the container
-            container.appendChild(imglink);
-
-            
-            // Create sizes list
-            const sizesList = document.createElement('ul');
-            const listItem = document.createElement('li');
-            listItem.textContent = sizes;
-            sizesList.appendChild(listItem);
-            sizesList.style.listStyleType = 'none';
-            // Apply CSS styles for centering
-            sizesList.style.display = 'flex';
-            sizesList.style.justifyContent = 'center';
-            sizesList.style.alignItems = 'center';
-            listItem.style.textAlign = 'center';
-            listItem.style.padding = '0';
-
-            // Append the sizes list to the container
-            container.appendChild(sizesList);
-
-            const priceElement = document.createElement('span');
-            priceElement.textContent = price;
-            priceElement.style.color ='red';
-
-            container.appendChild(priceElement);
-
-            // Append the container to the productDiv
-            productDiv.appendChild(container);
-
-            });
+          });
         });
+
+        function filterProducts(data, selectedSize) {
+          if (selectedSize === '') {
+            return data;
+          } else {
+            const filteredData = {};
+            Object.entries(data).forEach(([productId, productData]) => {
+              const avail = {};
+              Object.entries(productData.avail).forEach(([color, colorData]) => {
+                console.log(colorData);
+                const sizes = Object.values(colorData)[0].map(item => item[0]);
+                if (sizes.includes(selectedSize)) {
+                  avail[color] = colorData;
+                }
+              });
+              if (Object.keys(avail).length > 0) {
+                filteredData[productId] = { ...productData, avail };
+              }
+            });
+            return filteredData;
+          }
+        }
+        
+       
+        // Function to render products
+        function renderProducts(products) {
+          const productContainer = document.getElementById('productContainer');
+          productContainer.innerHTML = '';
+          let count = 0;
+          Object.entries(products).forEach(([productId, productData]) => {
+            const avail = productData.avail;
+            const rawPrice = productData.price;
+            //console.log('product is');
+            //console.log(productData);
+            const price = rawPrice.substring(0, rawPrice.length - 2);
+            //console.log(avail);
+            Object.entries(avail).forEach(([color, colorData]) => {
+              count++;
+              const imgLink = colorData.img_link;
+              const link = colorData.link;
+              //console.log(colorData[0])
+              const sizes = Object.values(colorData)[0].map(item => item[0]);
+              //console.log(sizes);
+
+              // Create product container
+              const productContainer = document.getElementById('productContainer');
+              const productDiv = document.createElement('div');
+              productDiv.classList.add('product');
+              productContainer.appendChild(productDiv);
+              
+              // Create container element
+              const container = document.createElement('div');
+              container.style.border = '1px solid #000'; // Add border
+              container.style.display = 'inline-block'; // Display as inline-block to create a square shape
+
+              // Create image element
+              const image = document.createElement('img');
+              image.src = imgLink;
+              image.alt = productId;
+              image.style.width = '200px';  // Set the desired width
+              image.style.height = 'auto';
+              productDiv.appendChild(image);
+              
+              // Create anchor element
+              const imglink = document.createElement('a');
+              imglink.href = link;
+              imglink.target = '_blank'; // Open link in a new tab/window
+              imglink.appendChild(image);
+              
+              // Append the anchor element to the container
+              container.appendChild(imglink);
+
+              
+              // Create sizes list
+              const sizesList = document.createElement('ul');
+              const listItem = document.createElement('li');
+              listItem.textContent = sizes;
+              sizesList.appendChild(listItem);
+              sizesList.style.listStyleType = 'none';
+              // Apply CSS styles for centering
+              sizesList.style.display = 'flex';
+              sizesList.style.justifyContent = 'center';
+              sizesList.style.alignItems = 'center';
+              listItem.style.textAlign = 'center';
+              listItem.style.padding = '0';
+
+              // Append the sizes list to the container
+              container.appendChild(sizesList);
+
+              const priceElement = document.createElement('span');
+              priceElement.textContent = rawPrice;
+              priceElement.style.color ='red';
+
+              container.appendChild(priceElement);
+
+              // Append the container to the productDiv
+              productDiv.appendChild(container);
+          });
+        });
+        // Update item count
+        updateItemCount(count);
+      }
+
+      function updateItemCount(count) {
         const itemNum = document.createElement('div');
-        itemNum.textContent = count + "items";
+        itemNum.textContent = count + " items";
         const countContainer = document.getElementById('itemCount');
+        
+        // Clear the previous count
+        countContainer.innerHTML = '';
+        
+        // Append the updated count
         countContainer.appendChild(itemNum);
-
-
-      })
-      .catch(error => console.error('Error fetching JSON:', error));
+      }
+    }).catch(error => console.error('Error fetching JSON:', error));
   </script>
 </body>
 </html>
